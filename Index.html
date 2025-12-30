@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>काजल साड़ी कलेक्शन - एडमिन पैनल</title>
+    <style>
+        /* CSS: डिजाइन */
+        :root {
+            --primary: #880e4f; /* मैरून */
+            --secondary: #d81b60; /* डार्क पिंक */
+            --light: #fff0f5; /* लाइट पिंक */
+            --dark: #1a1a1a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--light); color: #333; padding-bottom: 50px; }
+
+        /* हेडर */
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        header h1 { font-size: 1.5rem; }
+
+        nav ul { list-style: none; display: flex; }
+        nav ul li { margin-left: 15px; }
+        
+        /* लिंक का स्टाइल सुधारा */
+        nav ul li a { 
+            color: white; 
+            text-decoration: none; 
+            cursor: pointer; 
+            font-weight: 500; 
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        nav ul li a:hover { background: rgba(255,255,255,0.2); }
+
+        /* सेक्शन कंट्रोल (Pages hiding/showing) */
+        .page-section { display: none; padding: 40px 5%; animation: fadeIn 0.4s; }
+        .active-section { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* होम पेज */
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000');
+            background-size: cover; 
+            background-position: center;
+            color: white; 
+            text-align: center; 
+            padding: 80px 20px;
+            border-radius: 0 0 20px 20px;
+        }
+        .hero h2 { font-size: 2.2rem; margin-bottom: 10px; }
+        .hero button { background: var(--secondary); color: white; border: none; padding: 10px 25px; border-radius: 50px; cursor: pointer; font-size: 1.1rem; margin-top: 10px; }
+
+        /* ग्रिड सिस्टम */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            padding-bottom: 15px;
+            position: relative;
+        }
+        .card img { width: 100%; height: 220px; object-fit: cover; }
+        .card h4 { margin: 10px 0 5px; color: var(--primary); }
+        .card .price { color: var(--secondary); font-weight: bold; font-size: 1.2rem; }
+
+        /* About Page */
+        .about-content { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .about-content h2 { color: var(--primary); border-bottom: 2px solid var(--secondary); display: inline-block; margin-bottom: 20px; }
+
+        /* ADMIN & LOGIN */
+        .login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none; justify-content: center; align-items: center; z-index: 2000;
+        }
+        .login-box { background: white; padding: 30px; border-radius: 10px; text-align: center; width: 300px; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
+        .login-box input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; }
+        .login-box button { width: 100%; padding: 10px; background: var(--primary); color: white; border: none; cursor: pointer; border-radius: 5px; }
+
+        .admin-controls {
+            background: #fff; padding: 20px; border-radius: 10px; border: 2px dashed var(--primary); margin-bottom: 30px;
+        }
+        .input-group { margin-bottom: 10px; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .input-group input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .add-btn { background: green; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 5px; width: 100%; font-size: 1rem; }
+
+        /* Delete Button */
+        .del-btn {
+            background: red; color: white; border: none; padding: 5px 10px; margin-top: 5px; cursor: pointer; border-radius: 3px; display: none;
+        }
+
+        footer { background: var(--dark); color: white; text-align: center; padding: 20px; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>काजल साड़ी</h1>
+        <nav>
+            <ul>
+                <li><a href="#" onclick="showPage('home')">होम</a></li>
+                <li><a href="#" onclick="showPage('about')">About</a></li>
+                <li><a href="#" onclick="showPage('gallery')">गैलरी</a></li>
+                <li><a href="#" onclick="openLogin()" style="color: yellow;">(Admin)</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="home" class="page-section active-section">
+        <div class="hero">
+            <h2>Kajal Saree Collection</h2>
+            <p>तहसील के पास, विजयपुर</p>
+            <button onclick="window.location.href='tel:9754275671'">📞 कॉल करें: 9754275671</button>
+        </div>
+        <h2 style="text-align:center; margin-top:30px; color: #880e4f;">नया कलेक्शन</h2>
+        <div class="grid-container" id="product-list">
+            </div>
+    </section>
+
+    <section id="about" class="page-section">
+        <div class="about-content">
+            <h2>हमारे बारे में</h2>
+            <p><strong>मालिक:</strong> फेरन जाटव (Feran Jatav)</p>
+            <p><strong>संपर्क:</strong> 9754275671</p>
+            <p><strong>पता:</strong> नज़दीक तहसील, विजयपुर (म.प्र.)</p>
+            <br>
+            <p>काजल साड़ी कलेक्शन में आपका स्वागत है! हम आपके लिए लाते हैं सबसे बेहतरीन साड़ियाँ, वो भी सबसे सही दाम पर। शादी हो या कोई त्यौहार, हमारे पास हर मौके के लिए खास कलेक्शन है।</p>
+        </div>
+    </section>
+
+    <section id="gallery" class="page-section">
+        <h2 style="text-align:center; color: #880e4f;">दुकान की फोटो</h2>
+        <div class="grid-container" id="gallery-list">
+            </div>
+    </section>
+
+    <section id="admin" class="page-section">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2 style="color: red;">एडमिन पैनल</h2>
+            <button onclick="logout()" style="background:red; color:white; padding:5px 10px; border:none; cursor:pointer;">लॉग आउट</button>
+        </div>
+
+        <div class="admin-controls">
+            <h3>👗 नई साड़ी जोड़ें</h3>
+            <div class="input-group">
+                <label>नाम:</label>
+                <input type="text" id="new-p-name" placeholder="जैसे: पार्टी वियर साड़ी">
+            </div>
+            <div class="input-group">
+                <label>कीमत:</label>
+                <input type="number" id="new-p-price" placeholder="जैसे: 2000">
+            </div>
+            <div class="input-group">
+                <label>फोटो लिंक (URL):</label>
+                <input type="text" id="new-p-img" placeholder="फोटो का लिंक यहाँ डालें">
+            </div>
+            <button class="add-btn" onclick="addProduct()">वेबसाइट पर डालें</button>
+        </div>
+
+        <div class="admin-controls" style="border-color: #3498db;">
+            <h3>📷 दुकान की फोटो जोड़ें</h3>
+            <div class="input-group">
+                <label>फोटो लिंक (URL):</label>
+                <input type="text" id="new-g-img" placeholder="दुकान की फोटो का लिंक">
+            </div>
+            <button class="add-btn" style="background-color: #3498db;" onclick="addGallery()">गैलरी में डालें</button>
+        </div>
+    </section>
+
+    <div id="login-modal" class="login-screen">
+        <div class="login-box">
+            <h3>🔐 मालिक लॉगिन</h3>
+            <input type="password" id="admin-pass" placeholder="पासवर्ड डालें">
+            <button onclick="checkPassword()">लॉगिन करें</button>
+            <button onclick="closeLogin()" style="background:grey; margin-top:10px;">रद्द करें</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Kajal Saree Collection</p>
+    </footer>
+
+    <script>
+        // डिफॉल्ट डेटा
+        const defaultProducts = [
+            { name: "बनारसी सिल्क", price: 1500, img: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=500" },
+            { name: "डेली वियर कॉटन", price: 450, img: "https://images.unsplash.com/photo-1583391733958-e0237e8c07e0?w=500" },
+            { name: "डिज़ाइनर पार्टी वियर", price: 1200, img: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=500" }
+        ];
+
+        const defaultGallery = [
+            { img: "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=500" },
+            { img: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=500" }
+        ];
+
+        // डेटा लोड करना (Safe Mode)
+        let products = [];
+        let gallery = [];
+        
+        try {
+            products = JSON.parse(localStorage.getItem('products')) || defaultProducts;
+            gallery = JSON.parse(localStorage.getItem('gallery')) || defaultGallery;
+        } catch (e) {
+            console.log("Local Storage Error", e);
+            products = defaultProducts;
+            gallery = defaultGallery;
+        }
+
+        // पेज बदलने वाला फंक्शन
+        function showPage(pageId) {
+            // सारे सेक्शन छुपाओ
+            document.querySelectorAll('.page-section').forEach(sec => sec.style.display = 'none');
+            // जो चाहिए वो दिखाओ
+            document.getElementById(pageId).style.display = 'block';
+            // ऊपर ले जाओ
+            window.scrollTo(0, 0);
+        }
+
+        // प्रोडक्ट दिखाना (Render)
+        function render() {
+            const pList = document.getElementById('product-list');
+            pList.innerHTML = "";
+            products.forEach((p, index) => {
+                pList.innerHTML += `
+                    <div class="card">
+                        <img src="${p.img}" alt="${p.name}">
+                        <h4>${p.name}</h4>
+                        <span class="price">₹${p.price}</span>
+                        <br>
+                        <button onclick="deleteProduct(${index})" class="del-btn">🗑️ हटाएं</button>
+                    </div>
+                `;
+            });
+
+            const gList = document.getElementById('gallery-list');
+            gList.innerHTML = "";
+            gallery.forEach((g, index) => {
+                gList.innerHTML += `
+                    <div class="card">
+                        <img src="${g.img}">
+                    </div>
+                `;
+            });
+        }
+
+        // --- एडमिन लॉजिक ---
+        let isAdmin = false;
+
+        function openLogin() {
+            document.getElementById('login-modal').style.display = 'flex';
+        }
+
+        function closeLogin() {
+            document.getElementById('login-modal').style.display = 'none';
+        }
+
+        function checkPassword() {
+            const pass = document.getElementById('admin-pass').value;
+            if (pass === "admin123") { // पासवर्ड
+                isAdmin = true;
+                closeLogin();
+                showPage('admin');
+                alert("लॉगिन सफल!");
+                toggleDeleteButtons(true);
+            } else {
+                alert("गलत पासवर्ड!");
+            }
+        }
+
+        function logout() {
+            isAdmin = false;
+            showPage('home');
+            toggleDeleteButtons(false);
+            alert("लॉग आउट हो गए।");
+        }
+
+        function toggleDeleteButtons(show) {
+            const display = show ? 'inline-block' : 'none';
+            document.querySelectorAll('.del-btn').forEach(btn => btn.style.display = display);
+        }
+
+        // नया आइटम जोड़ना
+        function addProduct() {
+            const name = document.getElementById('new-p-name').value;
+            const price = document.getElementById('new-p-price').value;
+            const img = document.getElementById('new-p-img').value;
+
+            if(name && price && img) {
+                products.push({ name, price, img });
+                saveData();
+                render();
+                if(isAdmin) toggleDeleteButtons(true);
+                alert("आइटम जुड़ गया!");
+                document.getElementById('new-p-name').value = '';
+            } else {
+                alert("कृपया पूरी जानकारी भरें");
+            }
+        }
+
+        function addGallery() {
+            const img = document.getElementById('new-g-img').value;
+            if(img) {
+                gallery.push({ img });
+                saveData();
+                render();
+                alert("फोटो जुड़ गई!");
+                document.getElementById('new-g-img').value = '';
+            }
+        }
+
+        function deleteProduct(index) {
+            if(confirm("पक्का हटाना है?")) {
+                products.splice(index, 1);
+                saveData();
+                render();
+                toggleDeleteButtons(true); // Re-show buttons after render
+            }
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem('products', JSON.stringify(products));
+                localStorage.setItem('gallery', JSON.stringify(gallery));
+            } catch (e) {
+                console.error("Save failed", e);
+            }
+        }
+
+        // शुरुआत
+        render();
+        showPage('home'); // डिफ़ॉल्ट होम पेज
+    </script>
+
+</body>
+</html>
